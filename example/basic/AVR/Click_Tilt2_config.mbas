@@ -1,0 +1,4 @@
+module Click_Tilt2_config
+
+include Click_Tilt2_types
+end.

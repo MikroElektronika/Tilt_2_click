@@ -1,0 +1,61 @@
+{
+Example for Tilt2 Click
+
+    Date          : dec 2018.
+    Author        : Katarina Perendic
+
+Test configuration CEC :
+    
+    MCU              : CEC1702
+    Dev. Board       : Clicker 2 for CEC1702
+    ARM Compiler ver : v6.0.0.0
+
+---
+
+Description :
+
+The application is composed of three sections :
+
+- System Initialization - Sets INT pin as INPUT for tilt detection
+- Application Initialization - Initialization driver init
+- Application Task - (code snippet) - Tilt detection, if the tilt is detected, the message is logs on USBUART.
+
+}
+program Click_Tilt2_CEC;
+
+uses Click_Tilt2_types, Click_Tilt2_config;
+
+procedure systemInit(); 
+begin
+    mikrobus_gpioInit(_MIKROBUS1, _MIKROBUS_INT_PIN, _GPIO_INPUT); 
+    mikrobus_logInit(_MIKROBUS2, 9600); 
+    mikrobus_logWrite(' --- System Init --- ', _LOG_LINE); 
+    Delay_100ms(); 
+end;
+
+procedure applicationInit(); 
+begin
+    tilt2_gpioDriverInit(T_TILT2_P(@_MIKROBUS1_GPIO)); 
+end;
+
+procedure applicationTask(); 
+var
+    tilt : uint8_t; 
+begin
+    tilt := tilt2_tiltDetection(); 
+    if (tilt = _TILT2_TILT_DETECTION) then 
+    begin
+        mikrobus_logWrite(' Tilt detection.. ', _LOG_LINE); 
+        Delay_ms(300); 
+    end; 
+end;
+
+begin
+
+    systemInit(); 
+    applicationInit(); 
+    while (1) do 
+    begin 
+        applicationTask(); 
+    end;
+end.

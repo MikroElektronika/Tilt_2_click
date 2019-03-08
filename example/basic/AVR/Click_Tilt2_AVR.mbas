@@ -1,0 +1,57 @@
+'
+'Example for Tilt2 Click
+'
+'    Date          : dec 2018.
+'    Author        : Katarina Perendic
+'
+'Test configuration AVR :
+'    
+'    MCU              : ATMEGA32
+'    Dev. Board       : EasyAVR v7 
+'    AVR Compiler ver : v7.0.1.0
+'
+'---
+'
+'Description :
+'
+'The application is composed of three sections :
+'
+'- System Initialization - Sets INT pin as INPUT for tilt detection
+'- Application Initialization - Initialization driver init
+'- Application Task - (code snippet) - Tilt detection, if the tilt is detected, the message is logs on USBUART.
+'
+'
+program Click_Tilt2_AVR
+
+include Click_Tilt2_types
+include Click_Tilt2_config
+sub procedure systemInit() 
+    mikrobus_gpioInit(_MIKROBUS1, _MIKROBUS_INT_PIN, _GPIO_INPUT) 
+    mikrobus_logInit(_LOG_USBUART, 9600) 
+    mikrobus_logWrite(" --- System Init --- ", _LOG_LINE) 
+    Delay_100ms() 
+end sub
+
+sub procedure applicationInit() 
+    tilt2_gpioDriverInit(T_TILT2_P(@_MIKROBUS1_GPIO)) 
+end sub
+
+sub procedure applicationTask() 
+dim
+    tilt as uint8_t 
+
+    tilt = tilt2_tiltDetection() 
+    if (tilt = _TILT2_TILT_DETECTION) then 
+        mikrobus_logWrite(" Tilt detection.. ", _LOG_LINE) 
+        Delay_ms(300) 
+    end if
+end sub
+
+main :
+
+    systemInit() 
+    applicationInit() 
+    while (1) 
+        applicationTask() 
+    wend
+end.
